@@ -13,11 +13,17 @@ class HttpHelper {
     if (result.statusCode == HttpStatus.ok) {
       final jsonResponse = json.decode(result.body);
       List<Pizza> pizzas = jsonResponse.map<Pizza>((i) => Pizza.fromJson(i)).toList();
-      print('Pizza list: $pizzas');
       return pizzas;
     } else {
-      print('Error helper: ${result.statusCode}');
       return [];
     }
+  }
+
+  Future<String> postPizza(Pizza pizza) async {
+    const postPath = '/pizza';
+    String post = json.encode(pizza.toJson());
+    Uri url = Uri.https(authority, postPath);
+    http.Response rsl = await http.post(url, body: post);
+    return rsl.body;
   }
 }

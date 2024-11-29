@@ -107,3 +107,230 @@ Widget build(BuildContext context) {
 ## 10. Jalankan aplikasi. Anda akan melihat layar yang mirip dengan berikut ini: 
 
 ![image for practicum 1 step 10](images/p1-10.png)
+
+# Praktikum 2. POST-ing data 
+> Dalam praktikum ini, Anda akan mempelajari cara melakukan tindakan POST pada layanan web. Hal ini berguna ketika Anda menyambungkan ke layanan web yang tidak hanya menyediakan data, tetapi juga memungkinkan Anda untuk mengubah informasi yang tersimpan di sisi server. Biasanya, Anda harus menyediakan beberapa bentuk autentikasi ke layanan, tetapi untuk praktikum ini, karena kita menggunakan layanan Mock API, hal ini tidak diperlukan. 
+
+## 1. Masuk ke layanan Lab Mock di https://app.wiremock.cloud/ dan klik bagian Stubs, kemudian, buatlah stub baru. 
+
+![image for practicum 2 step 1](images/p2-1.png)
+
+## 2. Lengkapi isian seperti gambar berikut: 
+
+![image for practicum 2 step 2](images/p2-2.png)
+
+## 3. Simpan. 
+
+![image for practicum 2 step 3](images/p2-3.png)
+
+## 4. Di proyek Flutter, di file httpHelper.dart, di kelas HttpHelper, buat metode baru bernama postPizza, lengkapi kode sebagai berikut. 
+
+```dart
+Future<String> postPizza(Pizza pizza) async {
+  const postPath = '/pizza';
+  String post = json.encode(pizza.toJson());
+  Uri url = Uri.https(authority, postPath);
+  http.Response result = await http.post(url, body: post);
+  return result.body;
+}
+```
+
+## 5. Di dalam proyek, buat sebuah file baru bernama pizza_detail.dart. 
+
+![image for practicum 2 step 5](images/p2-5.png)
+
+## 6. Di bagian atas file baru, tambahkan impor yang diperlukan. 
+
+```dart
+import 'package:flutter/material.dart';
+import 'pizza.dart';
+import 'httphelper.dart';
+```
+
+## 7. Buat StatefulWidget bernama PizzaDetailScreen. 
+
+```dart
+import 'package:flutter/material.dart';
+import 'pizza.dart';
+import 'httphelper.dart';
+
+class PizzaDetailScreen extends StatefulWidget {
+  const PizzaDetailScreen({super.key});
+
+  @override
+  State<PizzaDetailScreen> createState() => _PizzaDetailScreenState();
+}
+
+class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Placeholder();
+  }
+}
+```
+
+## 8. Di bagian atas kelas _PizzaDetailScreenState, tambahkan lima widget TextEditingController. Widget ini akan berisi data untuk objek Pizza yang akan diposting nanti. Juga, tambahkan sebuah String yang akan berisi hasil dari permintaan POST. 
+
+```dart
+class _PizzaDetailScreenState extends State<PizzaDetailScreen> 
+  final TextEditingController txtId = TextEditingController();
+  final TextEditingController txtName = TextEditingController();
+  final TextEditingController txtDescription = TextEditingController();
+  final TextEditingController txtPrice = TextEditingController();
+  final TextEditingController txtImageUrl = TextEditingController();
+  String operationResult = '';
+```
+
+## 9. Override metode dispose() untuk membuang controllers 
+
+```dart
+@override
+void dispose() {
+  txtId.dispose();
+  txtName.dispose();
+  txtDescription.dispose();
+  txtPrice.dispose();
+  txtImageUrl.dispose();
+  super.dispose();
+}
+```
+
+## 10. Dalam metode build() pada kelas, kita return sebuah Scaffold, yang AppBar-nya berisi Teks yang menyatakan “Detail Pizza” dan Body-nya berisi Padding dan SingleChildScrollView yang berisi Column. 
+
+```dart
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Pizza Detail'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(12),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [],
+        ),
+      ),
+    ),
+  );
+}
+```
+
+## 11. Untuk properti anak dari Column, tambahkan beberapa Text yang akan berisi hasil posting, lima TextFields, masing-masing terikat pada TextEditingController, dan sebuah ElevatedButton untuk menyelesaikan aksi POST (metode postPizza akan dibuat berikutnya). Juga, tambahkan SizedBox untuk memberi jarak pada widget di layar.
+
+```dart
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Pizza Detail'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(12),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              operationResult,
+              style: TextStyle(
+                backgroundColor: Colors.green[200],
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: txtId,
+              decoration: const InputDecoration(
+                hintText: 'Insert ID',
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: txtName,
+              decoration: const InputDecoration(
+                hintText: 'Insert Pizza Name',
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: txtDescription,
+              decoration: const InputDecoration(
+                hintText: 'Insert Description',
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: txtPrice,
+              decoration: const InputDecoration(
+                hintText: 'Insert Price',
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: txtImageUrl,
+              decoration: const InputDecoration(
+                hintText: 'Insert Image Url',
+              ),
+            ),
+            SizedBox(height: 48),
+            ElevatedButton(
+              onPressed: () {
+                postPizza();
+              },
+              child: const Text('Send Post'),
+            )
+          ],
+        ),
+      ),
+    ),
+  );
+}
+```
+
+## 12. Di bagian bawah kelas _PizzaDetailState, tambahkan metode postPizza. 
+
+```dart
+Future postPizza() async {
+  HttpHelper helper = HttpHelper();
+  Pizza pizza = Pizza(
+    id: int.tryParse(txtId.text) ?? 0,
+    pizzaName: txtName.text,
+    description: txtDescription.text,
+    price: double.tryParse(txtPrice.text) ?? 0.0,
+    imageUrl: txtImageUrl.text,
+  );
+  String result = await helper.postPizza(pizza);
+  setState(() {
+    operationResult = result;
+  });
+}
+```
+
+## 13. Di file main.dart, impor file pizza_detail.dart. 
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:pizza_api_lukman/httphelper.dart';
+import 'package:pizza_api_lukman/pizza.dart';
+import 'package:pizza_api_lukman/pizza_detail.dart';
+```
+
+## 14. Di perancah metode build() dari kelas _MyHomePageState, tambahkan FloatingActionButton yang akan menavigasi ke rute PizzaDetail. 
+
+```dart
+floatingActionButton: FloatingActionButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PizzaDetailScreen()),
+    );
+  },
+),
+```
+
+## 15. Jalankan aplikasi. Pada layar utama, tekan FloatingActionButton untuk menavigasi ke rute PizzaDetail 
+
+![image for practicum 2 step 5](images/p2-15.gif)
+
+## 16. Tambahkan detail pizza di kolom teks dan tekan tombol Kirim Postingan. Anda akan melihat hasil yang berhasil, seperti yang ditunjukkan pada gambar berikut. 
+
+![image for practicum 2 step 6](images/p2-16.png)
+

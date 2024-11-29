@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_api_lukman/httphelper.dart';
 import 'package:pizza_api_lukman/pizza.dart';
+import 'package:pizza_api_lukman/pizza_detail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -61,6 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 subtitle: Text(snapshot.data![position].description + ' - € ' + snapshot.data![position].price.toString()),
               );
             }
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PizzaDetailScreen()),
           );
         },
       ),
