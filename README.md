@@ -447,3 +447,59 @@ floatingActionButton: FloatingActionButton(
 ## 11. Edit detail pizza di kolom teks dan tekan tombol Simpan. Anda akan melihat pesan yang menunjukkan bahwa detail pizza telah diperbarui 
 
 ![image for practicum 3 step 11](images/p3-11.png)
+
+# Praktikum 4, DELETE-ing data 
+## 1. Masuk ke layanan Wiremock di https://app.wiremock.cloud dan klik pada bagian Stubs pada contoh API. Kemudian, buatlah sebuah stub baru 
+
+![image for practicum 4 step 1](images/p4-1.png)
+
+## 2. Lengkapi isian, dengan data berikut: 
+  - Name: Delete Pizza 
+  - Verb: DELETE 
+  - Address: /pizza 
+  - Status: 200 
+  - Body Type: json 
+  - Body: {"message": "Pizza was deleted"} 
+
+![image for practicum 4 step 2](images/p4-2.png)
+
+## 3. Save the new stub 
+
+![image for practicum 4 step 3](images/p4-3.png)
+
+## 4. Di proyek Flutter, tambahkan metode deletePizza ke kelas HttpHelper di file http_helper.dart 
+
+```dart
+Future<String> deletePizza(int id) async {
+  final deletePath = '/pizza';
+  Uri url = Uri.https(authority, deletePath);
+  http.Response rsl = await http.delete(url);
+  return rsl.body;
+}
+```
+
+## 5. Pada file main.dart, di metode build kelas _MyHomePageState, refaktor itemBuilder dari ListView.builder agar ListTile terdapat dalam widget Dismissible, seperti berikut 
+
+```dart
+return Dismissible(
+  key: Key(position.toString()),
+  onDismissed: (item) {
+    HttpHelper helper = HttpHelper();
+    snapshot.data!.removeWhere((element) => element.id == snapshot.data![position].id);
+  },
+  child: ListTile(
+    title: Text(snapshot.data![position].pizzaName),
+    subtitle: Text(snapshot.data![position].description + ' - € ' + snapshot.data![position].price.toString()),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PizzaDetailScreen(pizza: snapshot.data![position], isNew: false,)),
+      );
+    },
+  ),
+);
+```
+
+## 6. Jalankan aplikasi. Saat Anda menggeser elemen apa pun dari daftar pizza, ListTile akan menghilang 
+
+![image for practicum 4 step 6](images/p4-6.gif)

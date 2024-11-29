@@ -34,4 +34,11 @@ class HttpHelper {
     http.Response rsl = await http.put(url, body: put);
     return rsl.body;
   }
+
+  Future<String> deletePizza(int id) async {
+    final deletePath = '/pizza';
+    Uri url = Uri.https(authority, deletePath);
+    http.Response rsl = await http.delete(url);
+    return rsl.body;
+  }
 }
